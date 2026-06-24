@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory, abort
 
 import data_loader
 import clustering
@@ -66,6 +66,14 @@ def result():
         provinces=clustering.provinces_by_cluster(result_df),
         cluster_colors=clustering.CLUSTER_COLORS,
     )
+
+
+@app.route('/data/<path:filename>')
+def download_data(filename):
+    # hanya izinkan file .xlsx di folder data/
+    if not filename.endswith('.xlsx'):
+        abort(404)
+    return send_from_directory(data_loader.DATA_DIR, filename, as_attachment=True)
 
 
 if __name__ == '__main__':

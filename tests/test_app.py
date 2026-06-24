@@ -54,3 +54,15 @@ def test_result_handles_k_too_large():
     client = make_client()
     resp = client.post('/result', data={'k': '999', 'features': 'kemiskinan'})
     assert resp.status_code == 200
+
+
+def test_download_data_serves_xlsx():
+    client = make_client()
+    resp = client.get('/data/miskin_2023.xlsx')
+    assert resp.status_code == 200
+
+
+def test_download_data_rejects_non_xlsx():
+    client = make_client()
+    resp = client.get('/data/secret.txt')
+    assert resp.status_code == 404
