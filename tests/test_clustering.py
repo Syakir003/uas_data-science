@@ -35,3 +35,37 @@ def test_compute_elbow_lengths():
     ks, inertias, sils = clustering.compute_elbow(clean, features)
     assert list(ks) == [2, 3, 4, 5, 6]
     assert len(inertias) == 5 and len(sils) == 5
+
+
+def _result_keduanya(k=3):
+    data = data_loader.load_data()
+    clean, features = clustering.prepare_features(data, 'keduanya')
+    result, _ = clustering.run_clustering(clean, features, k)
+    return result, features
+
+
+def test_make_elbow_chart_returns_html():
+    ks, inertias, _ = clustering.compute_elbow(
+        *clustering.prepare_features(data_loader.load_data(), 'keduanya'))
+    html = clustering.make_elbow_chart(ks, inertias)
+    assert isinstance(html, str) and 'plotly' in html.lower()
+
+
+def test_make_scatter_chart_returns_html():
+    result, _ = _result_keduanya()
+    html = clustering.make_scatter_chart(result, 'keduanya')
+    assert isinstance(html, str) and '<div' in html
+
+
+def test_cluster_profile_one_row_per_cluster():
+    result, features = _result_keduanya(k=3)
+    profile = clustering.cluster_profile(result, features)
+    assert len(profile) == 3
+    assert 'Cluster' in profile[0]
+
+
+def test_provinces_by_cluster_covers_all():
+    result, _ = _result_keduanya(k=3)
+    mapping = clustering.provinces_by_cluster(result)
+    total = sum(len(v) for v in mapping.values())
+    assert total == len(result)
