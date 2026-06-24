@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Hasil Klasterisasi — KlasterID{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Hasil Klasterisasi</h4>
+  <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-sm">← Ubah Parameter</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3 col-6">
+    <div class="card text-center shadow-sm"><div class="card-body">
+      <div class="text-muted small">Jumlah Cluster</div>
+      <div class="fs-3 fw-bold text-primary">{{ k }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="card text-center shadow-sm"><div class="card-body">
+      <div class="text-muted small">Provinsi Dianalisis</div>
+      <div class="fs-3 fw-bold text-primary">{{ n_prov }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="card text-center shadow-sm"><div class="card-body">
+      <div class="text-muted small">Silhouette Score</div>
+      <div class="fs-3 fw-bold text-primary">{{ silhouette }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="card text-center shadow-sm"><div class="card-body">
+      <div class="text-muted small">Provinsi Tak Lengkap</div>
+      <div class="fs-3 fw-bold text-secondary">{{ dropped }}</div>
+    </div></div>
+  </div>
+</div>
+
+{% if dropped > 0 %}
+<div class="alert alert-warning">
+  {{ dropped }} provinsi dikecualikan karena data tidak lengkap pada fitur terpilih.
+</div>
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm"><div class="card-body">{{ scatter_html | safe }}</div></div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card shadow-sm"><div class="card-body">{{ elbow_html | safe }}</div></div>
+  </div>
+</div>
+
+<div class="card shadow-sm mt-4"><div class="card-body">
+  <h5 class="mb-3">Profil Cluster (rata-rata)</h5>
+  <div class="table-responsive">
+    <table class="table table-bordered table-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          {% for key in profile[0].keys() %}<th>{{ key }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in profile %}
+        <tr>
+          {% for key, val in row.items() %}
+            <td>{% if key == 'Cluster' %}
+              <span class="badge" style="background-color: {{ cluster_colors[val] }}">Cluster {{ val }}</span>
+            {% else %}{{ val }}{% endif %}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div></div>
+
+<div class="card shadow-sm mt-4"><div class="card-body">
+  <h5 class="mb-3">Daftar Provinsi per Cluster</h5>
+  <div class="row g-3">
+    {% for cid, provs in provinces.items() %}
+    <div class="col-md-4">
+      <div class="border rounded p-3 h-100">
+        <span class="badge mb-2" style="background-color: {{ cluster_colors[cid] }}">Cluster {{ cid }}</span>
+        <span class="text-muted small">({{ provs|length }} provinsi)</span>
+        <ul class="mb-0 ps-3 mt-2 small">
+          {% for p in provs %}<li>{{ p }}</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div></div>
+
+<div class="row g-4 mt-1">
+  {% if box_miskin_html %}
+  <div class="col-lg-6"><div class="card shadow-sm"><div class="card-body">{{ box_miskin_html | safe }}</div></div></div>
+  {% endif %}
+  {% if box_ipm_html %}
+  <div class="col-lg-6"><div class="card shadow-sm"><div class="card-body">{{ box_ipm_html | safe }}</div></div></div>
+  {% endif %}
+</div>
+
+{% endblock %}
