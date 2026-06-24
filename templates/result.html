@@ -63,7 +63,7 @@
         <tr>
           {% for key, val in row.items() %}
             <td>{% if key == 'Cluster' %}
-              <span class="badge" style="background-color: {{ cluster_colors[val] }}">Cluster {{ val }}</span>
+              <span class="badge" style="background-color: {{ cluster_colors[val % cluster_colors|length] }}">Cluster {{ val }}</span>
             {% else %}{{ val }}{% endif %}</td>
           {% endfor %}
         </tr>
@@ -79,7 +79,7 @@
     {% for cid, provs in provinces.items() %}
     <div class="col-md-4">
       <div class="border rounded p-3 h-100">
-        <span class="badge mb-2" style="background-color: {{ cluster_colors[cid] }}">Cluster {{ cid }}</span>
+        <span class="badge mb-2" style="background-color: {{ cluster_colors[cid % cluster_colors|length] }}">Cluster {{ cid }}</span>
         <span class="text-muted small">({{ provs|length }} provinsi)</span>
         <ul class="mb-0 ps-3 mt-2 small">
           {% for p in provs %}<li>{{ p }}</li>{% endfor %}

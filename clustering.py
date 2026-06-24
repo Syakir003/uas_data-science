@@ -61,11 +61,16 @@ def make_elbow_chart(ks, inertias):
     return fig.to_html(**_HTML_KW)
 
 
+def _color_map(result):
+    ids = sorted(int(c) for c in result['Cluster'].unique())
+    return {str(i): CLUSTER_COLORS[i % len(CLUSTER_COLORS)] for i in ids}
+
+
 def make_scatter_chart(result, feature_group):
     xcol, xlab, ycol, ylab = SCATTER_AXES[feature_group]
     fig = px.scatter(result, x=xcol, y=ycol, color=result['Cluster'].astype(str),
                      hover_name='Provinsi',
-                     color_discrete_sequence=CLUSTER_COLORS,
+                     color_discrete_map=_color_map(result),
                      labels={'color': 'Cluster', xcol: xlab, ycol: ylab})
     fig.update_traces(marker=dict(size=12, line=dict(width=1, color='white')))
     fig.update_layout(template='plotly_white', title='Sebaran Provinsi per Cluster',
@@ -77,7 +82,7 @@ def make_scatter_chart(result, feature_group):
 def make_boxplot(result, column, title):
     fig = px.box(result, x=result['Cluster'].astype(str), y=column,
                  color=result['Cluster'].astype(str),
-                 color_discrete_sequence=CLUSTER_COLORS)
+                 color_discrete_map=_color_map(result))
     fig.update_layout(template='plotly_white', title=title,
                       xaxis_title='Cluster', yaxis_title=column,
                       showlegend=False, margin=dict(l=40, r=20, t=50, b=40))

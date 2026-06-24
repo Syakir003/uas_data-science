@@ -22,17 +22,26 @@ def index():
 
 @app.route('/result', methods=['POST'])
 def result():
-    k = int(request.form.get('k', 3))
     feature_group = request.form.get('features', 'keduanya')
+    if feature_group not in clustering.FEATURE_GROUPS:
+        feature_group = 'keduanya'
 
-    data = data_loader.load_data()
+    try:
+        k = int(request.form.get('k', 3))
+    except (TypeError, ValueError):
+        k = 3
+
+    try:
+        data = data_loader.load_data()
+    except FileNotFoundError as exc:
+        return render_template('index.html', preview=None, error=str(exc))
+
     total_prov = len(data)
     clean, features = clustering.prepare_features(data, feature_group)
     dropped = total_prov - len(clean)
 
-    # validasi: k tidak boleh melebihi jumlah provinsi
-    if k > len(clean):
-        k = len(clean)
+    # clamp k to the valid silhouette range [2, n-1]
+    k = max(2, min(k, len(clean) - 1))
 
     result_df, silhouette = clustering.run_clustering(clean, features, k)
     ks, inertias, _ = clustering.compute_elbow(clean, features)

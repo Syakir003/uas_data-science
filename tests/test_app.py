@@ -30,3 +30,27 @@ def test_result_box_features_only_skips_ipm_box():
     client = make_client()
     resp = client.post('/result', data={'k': '3', 'features': 'kemiskinan'})
     assert resp.status_code == 200
+
+
+def test_result_handles_invalid_k():
+    client = make_client()
+    resp = client.post('/result', data={'k': 'abc', 'features': 'keduanya'})
+    assert resp.status_code == 200
+
+
+def test_result_handles_unknown_feature_group():
+    client = make_client()
+    resp = client.post('/result', data={'k': '3', 'features': 'banana'})
+    assert resp.status_code == 200
+
+
+def test_result_handles_k_too_small():
+    client = make_client()
+    resp = client.post('/result', data={'k': '1', 'features': 'ipm'})
+    assert resp.status_code == 200
+
+
+def test_result_handles_k_too_large():
+    client = make_client()
+    resp = client.post('/result', data={'k': '999', 'features': 'kemiskinan'})
+    assert resp.status_code == 200
